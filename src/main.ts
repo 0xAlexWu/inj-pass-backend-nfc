@@ -1,13 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import * as express from 'express';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  
+const server = express();
+
+export const createNextServer = async (expressInstance: any) => {
+  const app = await NestFactory.create(
+    AppModule,
+    new ExpressAdapter(expressInstance),
+  );
+
   // Enable CORS for frontend
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+    origin: process.env.FRONTEND_URL || '*',
     credentials: true,
   });
 
@@ -22,7 +29,19 @@ async function bootstrap() {
   // API prefix
   app.setGlobalPrefix('api');
 
-  await app.listen(process.env.PORT ?? 3000);
-  console.log(`Backend running on http://localhost:${process.env.PORT ?? 3000}`);
+  return app;
+};
+
+async function bootstrap() {
+  const app = await createNextServer(server);
+  await app.init();
+  
+  if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+    await app.listen(process.env.PORT ?? 3000);
+    console.log(`Backend running on http://localhost:${process.env.PORT ?? 3000}`);
+  }
 }
+
 bootstrap();
+
+export default server;
