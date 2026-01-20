@@ -14,18 +14,13 @@ export const createNextServer = async (expressInstance: any) => {
 
   app.enableCors({
     origin: (origin, callback) => {
-      const allowedOrigin = process.env.ORIGIN;
-      // Allow local development, Vercel domains, and the explicitly set ORIGIN
-      if (
-        !origin || 
-        origin.indexOf('localhost') !== -1 || 
-        origin.indexOf('vercel.app') !== -1 ||
-        (allowedOrigin && origin === allowedOrigin)
-      ) {
+      const allowedOrigins = process.env.ORIGINS?.split(',').map(o => o.trim()) || [];
+      
+      // Allow requests without origin (e.g., mobile apps, Postman) or from allowed origins
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        // In production, you might want to be stricter: callback(new Error('Not allowed by CORS'))
-        callback(null, true);
+        callback(new Error('Not allowed by CORS'));
       }
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
