@@ -65,4 +65,7 @@ if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
 }
 
 // Export for Vercel Serverless
-export default server;
+export default async (req: any, res: any) => {
+  await bootstrap();
+  return (server as any)(req, res);
+};
