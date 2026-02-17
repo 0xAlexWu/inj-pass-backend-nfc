@@ -6,6 +6,8 @@ import { redisStore } from 'cache-manager-redis-yet';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PasskeyModule } from './passkey/passkey.module';
+import { ProxyModule } from './proxy/proxy.module';
+import { Web3Module } from './web3/web3.module';
 
 @Module({
   imports: [
@@ -48,6 +50,8 @@ import { PasskeyModule } from './passkey/passkey.module';
     }),
 
     PasskeyModule,
+    ProxyModule,
+    Web3Module,
   ],
   controllers: [AppController],
   providers: [AppService],
